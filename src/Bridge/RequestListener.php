@@ -152,22 +152,11 @@ class RequestListener
     public function __invoke(ReactRequest $request, ReactResponse $response)
     {
         $method = $this->getMethod($request);
-        $headers = $request->getHeaders();
 
         $bridge = $this->getRequestBridge($request, $response, $method);
 
         if (\in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'])) {
-            $contentType = '';
-            if (isset($headers['Content-Type'])) {
-                $contentType = \implode(' ', (array) $headers['Content-Type']);
-            }
-
-            if (false !== \strpos($contentType, 'application/x-www-form-urlencoded')) {
-                $this->runRequestWithBody($request, $response, $bridge);
-            } else {
-                $response->writeHead(500);
-                $response->end('Request not managed');
-            }
+            $this->runRequestWithBody($request, $response, $bridge);
         } else {
             $this->runRequestWithNoBody($bridge);
         }
